@@ -1,6 +1,6 @@
-# Agents
+# Engineering Personas
 
-A collection of reusable AI agent personas designed for software engineering workflows with Claude Code.
+A Claude Code plugin providing reusable engineering personas as slash commands.
 
 ## Goals
 
@@ -8,8 +8,8 @@ Modern AI coding agents benefit from well-crafted personas that shape how they r
 
 This project solves that with a **hierarchical separation of concerns**:
 
-1. **Foundation layer** — A shared behavioral core loaded globally. Encodes engineering identity, communication principles, and decision-making heuristics that apply regardless of task type.
-2. **Specialized personas** — Focused, composable personas activated on demand via Claude Code skills. Each persona inherits the foundation and adds mode-specific instructions without conflicting defaults.
+1. **Foundation layer** — A shared behavioral core loaded globally via `~/.claude/CLAUDE.md`. Encodes engineering identity, communication principles, and decision-making heuristics that apply regardless of task type.
+2. **Specialized personas** — Focused, composable personas activated on demand via Claude Code commands. Each persona inherits the foundation and adds mode-specific instructions without conflicting defaults.
 
 ### Design Principles
 
@@ -23,24 +23,63 @@ This project solves that with a **hierarchical separation of concerns**:
 | Persona | Purpose | Activation |
 |---|---|---|
 | **Foundation** | Shared engineering identity, communication, decision-making | Global `~/.claude/CLAUDE.md` (always loaded) |
-| **Implementer** | Hands-on coding partner for active development | `/implementer` skill |
-| **Advisor** | Strategic technical thinking and analysis partner | `/advisor` skill |
+| **Implementer** | Hands-on coding partner for active development | `/implementer [task]` |
+| **Advisor** | Strategic technical thinking and analysis partner | `/advisor [question]` |
 
 ## Architecture
 
+This repo is structured as a Claude Code plugin:
+
 ```
-~/.claude/CLAUDE.md                  <- Foundation (always active)
-~/.claude/skills/implementer.md      <- Implementation partner skill
-~/.claude/skills/advisor.md          <- Technical advisor skill
-./CLAUDE.md (per-project)            <- Project-specific context
+.claude-plugin/
+└── plugin.json               # Plugin manifest
+commands/
+├── implementer.md            # /implementer command (thin wrapper)
+└── advisor.md                # /advisor command (thin wrapper)
+personas/
+├── foundation.md             # Global CLAUDE.md content (copy to ~/.claude/CLAUDE.md)
+├── implementer.md            # Implementation partner persona (referenced by command)
+└── advisor.md                # Technical advisor persona (referenced by command)
 ```
 
-The foundation provides behavioral DNA that both personas inherit. Project-level CLAUDE.md files supply tech stack, structure, commands, and domain context. Skills activate the appropriate operational mode.
+### How it works
+
+1. **Foundation** (`personas/foundation.md`) — Copy this content into `~/.claude/CLAUDE.md`. It loads into every conversation and provides shared behavioral DNA: communication style, decision-making principles, and engineering identity.
+
+2. **Commands** (`commands/implementer.md`, `commands/advisor.md`) — Thin wrappers that reference the full persona file via `@${CLAUDE_PLUGIN_ROOT}/personas/...` and pass through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
+
+3. **Personas** (`personas/implementer.md`, `personas/advisor.md`) — The full persona definitions. These are the source of truth for each mode's behavioral instructions. Commands reference these files; they are not loaded directly.
+
+4. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
+
+### Installation
+
+Install the plugin by adding it to your Claude Code settings:
+
+```bash
+claude plugins add ~/workspace/agents
+```
+
+Then copy the foundation persona to your global config:
+
+```bash
+cp personas/foundation.md ~/.claude/CLAUDE.md
+```
+
+## Usage
+
+```
+/implementer Fix the race condition in the session middleware
+/implementer Add pagination to the user list endpoint
+/advisor Help me understand the data flow in this codebase
+/advisor What should we prioritize for the next sprint?
+```
 
 ## Status
 
-- [ ] Foundation persona — draft
-- [ ] Implementer persona — draft
-- [ ] Advisor persona — draft
-- [ ] Skill integration and activation testing
+- [x] Foundation persona — draft
+- [x] Implementer persona — draft
+- [x] Advisor persona — draft
+- [x] Plugin structure and command wiring
 - [ ] Validation across multiple project types
+- [ ] Iteration based on real usage
