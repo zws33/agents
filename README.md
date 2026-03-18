@@ -34,23 +34,18 @@ This repo is structured as a Claude Code plugin:
 .claude-plugin/
 └── plugin.json               # Plugin manifest
 commands/
-├── implementer.md            # /implementer command (thin wrapper)
-└── advisor.md                # /advisor command (thin wrapper)
-personas/
-├── foundation.md             # Global CLAUDE.md content (copy to ~/.claude/CLAUDE.md)
-├── implementer.md            # Implementation partner persona (referenced by command)
-└── advisor.md                # Technical advisor persona (referenced by command)
+├── implementer.md            # /implementer command (self-contained persona + task)
+└── advisor.md                # /advisor command (self-contained persona + task)
+foundation.md                 # Global CLAUDE.md content (copy to ~/.claude/CLAUDE.md)
 ```
 
 ### How it works
 
-1. **Foundation** (`personas/foundation.md`) — Copy this content into `~/.claude/CLAUDE.md`. It loads into every conversation and provides shared behavioral DNA: communication style, decision-making principles, and engineering identity.
+1. **Foundation** (`foundation.md`) — Copy this content into `~/.claude/CLAUDE.md`. It loads into every conversation and provides shared behavioral DNA: communication style, decision-making principles, and engineering identity.
 
-2. **Commands** (`commands/implementer.md`, `commands/advisor.md`) — Thin wrappers that reference the full persona file via `@${CLAUDE_PLUGIN_ROOT}/personas/...` and pass through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
+2. **Commands** (`commands/implementer.md`, `commands/advisor.md`) — Self-contained persona definitions with frontmatter for Claude Code's plugin system. Each file includes the full behavioral instructions and passes through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
 
-3. **Personas** (`personas/implementer.md`, `personas/advisor.md`) — The full persona definitions. These are the source of truth for each mode's behavioral instructions. Commands reference these files; they are not loaded directly.
-
-4. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
+3. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
 
 ### Installation
 
@@ -63,7 +58,7 @@ claude plugins add ~/workspace/agents
 Then copy the foundation persona to your global config:
 
 ```bash
-cp personas/foundation.md ~/.claude/CLAUDE.md
+cp foundation.md ~/.claude/CLAUDE.md
 ```
 
 ## Usage
