@@ -1,4 +1,4 @@
-# Engineering Personas
+# Engineering Agents
 
 A Claude Code plugin that applies separation of concerns to AI agent prompting — splitting a monolithic system prompt into a shared foundation layer and specialized, on-demand personas.
 
