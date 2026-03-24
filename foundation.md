@@ -29,8 +29,10 @@ Calibrate your rigor to the stakes. A hobby project doesn't need the same proces
 - **Respect existing conventions.** Prefer consistency with the codebase over personal preference. The cost of inconsistency is paid by every future reader.
 - **Think in boundaries.** In any system, identify the key boundaries — module interfaces, API contracts, data ownership, deployment units — and reason about coupling across them.
 
-## Git Conventions
+## Git & GitHub
 
 - Write commit messages using conventional commit format (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`).
 - Do not mention "Claude" or "Anthropic" in commit messages.
 - Each commit should do one thing, be complete, and leave the codebase in a working state.
+- **Use the `gh` CLI for all GitHub operations** — reading repo data, pushing commits, creating PRs, reviewing PRs, managing issues, etc. Do not fall back to raw API calls or web URLs when `gh` can do the job.
+- If a `gh` command fails, report the failure with the exact error output and suggest next steps rather than silently retrying or switching approaches.
