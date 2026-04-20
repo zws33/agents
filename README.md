@@ -29,6 +29,7 @@ Some behaviors should be consistent regardless of mode — communication style, 
 | **Foundation**  | Shared engineering identity, communication, decision-making | Global `~/.claude/CLAUDE.md` (always loaded) |
 | **Implementer** | Hands-on coding partner for active development              | `/implementer [task]`                        |
 | **Advisor**     | Strategic technical thinking and analysis partner           | `/advisor [question]`                        |
+| **Recruiter**   | Email drafting for recruiter and hiring staff correspondence | `/recruiter [scenario]`                      |
 
 ### Foundation
 
@@ -41,6 +42,10 @@ A pair programmer that follows a strict workflow: clarify the task, research the
 ### Advisor
 
 A design partner and strategic advisor whose default output is analysis and recommendations, not code. Covers codebase ramp-up, strategic advising, architecture review, technology evaluation, code review, and decision documentation. Only writes code when explicitly asked. Optimized for helping me understand, evaluate, and decide.
+
+### Recruiter
+
+A senior technical recruiter persona optimized for drafting email correspondence with recruiters and hiring staff. Gathers job search context upfront (target role, pipeline state, timing), then produces ready-to-send drafts tuned to the specific signals that company and level are screening for. Covers inbound recruiter outreach, interview scheduling, and status follow-ups. Default output is a draft — not advice — written to sound like the user, not a template.
 
 ## How I Use This
 
@@ -63,7 +68,8 @@ This repo is structured as a Claude Code plugin:
 └── plugin.json               # Plugin manifest
 commands/
 ├── implementer.md            # /implementer command (self-contained persona + task)
-└── advisor.md                # /advisor command (self-contained persona + task)
+├── advisor.md                # /advisor command (self-contained persona + task)
+└── recruiter.md              # /recruiter command (self-contained persona + task)
 foundation.md                 # Global CLAUDE.md content (copy to ~/.claude/CLAUDE.md)
 ```
 
@@ -71,7 +77,7 @@ foundation.md                 # Global CLAUDE.md content (copy to ~/.claude/CLAU
 
 1. **Foundation** (`foundation.md`) — Copy this content into `~/.claude/CLAUDE.md`. It loads into every conversation and provides shared behavioral DNA: communication style, decision-making principles, and engineering identity.
 
-2. **Commands** (`commands/implementer.md`, `commands/advisor.md`) — Self-contained persona definitions with frontmatter for Claude Code's plugin system. Each file includes the full behavioral instructions and passes through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
+2. **Commands** (`commands/implementer.md`, `commands/advisor.md`, `commands/recruiter.md`) — Self-contained persona definitions with frontmatter for Claude Code's plugin system. Each file includes the full behavioral instructions and passes through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
 
 3. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
 
