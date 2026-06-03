@@ -14,7 +14,7 @@ To fix this I applied to a separation of concerns. Factor out the shared behavio
 A monolithic prompt that says "if advising, do X; if implementing, do Y" forces the agent to carry all instructions all the time and route between them implicitly. In practice, this led to mode bleed — advisory sessions would produce unsolicited code, implementation sessions would over-deliberate instead of building. Explicit persona activation eliminates the ambiguity: the agent knows exactly what mode it's in because it only has one set of instructions loaded.
 
 **Why a plugin architecture?**
-Claude Code's plugin system provides slash commands that activate personas with a single invocation. The alternative — maintaining multiple `CLAUDE.md` files and swapping them manually — is friction that kills adoption. The plugin structure means I can type `/advisor` or `/implementer` mid-session and the agent shifts modes cleanly. It also makes this shareable: anyone can install the plugin and get the same workflow.
+Claude Code's plugin system provides slash commands that activate personas with a single invocation. The alternative — maintaining multiple `CLAUDE.md` files and swapping them manually — is friction that kills adoption. The plugin structure means I can type `/engineering-agents:advisor` or `/engineering-agents:implementer` mid-session and the agent shifts modes cleanly. It also makes this shareable: anyone can install the plugin and get the same workflow.
 
 **Why these two personas specifically?**
 The advisor/implementer split maps to the two fundamental modes of engineering work: _thinking_ and _building_. The advisor persona is optimized for when I need to understand, evaluate, or decide — codebase ramp-ups, architecture reviews, tech debt assessment, prioritization. The implementer persona is optimized for when I need to ship — structured planning, TDD, disciplined commits. The boundary is clean because the outputs are different: analysis vs. code.
@@ -27,9 +27,11 @@ Some behaviors should be consistent regardless of mode — communication style, 
 | Persona         | Purpose                                                     | Activation                                   |
 | --------------- | ----------------------------------------------------------- | -------------------------------------------- |
 | **Foundation**  | Shared engineering identity, communication, decision-making | Global `~/.claude/CLAUDE.md` (always loaded) |
-| **Implementer** | Hands-on coding partner for active development              | `/implementer [task]`                        |
-| **Advisor**     | Strategic technical thinking and analysis partner           | `/advisor [question]`                        |
-| **Recruiter**   | Email drafting for recruiter and hiring staff correspondence | `/recruiter [scenario]`                      |
+| **Implementer** | Hands-on coding partner for active development              | `/engineering-agents:implementer [task]`                        |
+| **Advisor**     | Strategic technical thinking and analysis partner           | `/engineering-agents:advisor [question]`                        |
+| **Recruiter**   | Email drafting for recruiter and hiring staff correspondence | `/engineering-agents:recruiter [scenario]`                      |
+| **Interview**   | Simulated FAANG interview with mock, guided, code review, and stress-test modes | `/engineering-agents:interview [mode] [topic]`    |
+| **DSA Tutor**   | Socratic coaching toward the answer — never gives the solution directly         | `/engineering-agents:dsa-tutor [topic] [language]`|
 
 ### Foundation
 
@@ -47,15 +49,23 @@ A design partner and strategic advisor whose default output is analysis and reco
 
 A senior technical recruiter persona optimized for drafting email correspondence with recruiters and hiring staff. Gathers job search context upfront (target role, pipeline state, timing), then produces ready-to-send drafts tuned to the specific signals that company and level are screening for. Covers inbound recruiter outreach, interview scheduling, and status follow-ups. Default output is a draft — not advice — written to sound like the user, not a template.
 
+### Interview
+
+A FAANG-calibrated coding interview coach with four modes: Mock Interview (silent observer delivering a structured debrief at the end), Guided Practice (3-tier hint system from Socratic nudge to explicit reveal), Code Review (correctness, complexity, and code quality critique), and Stress Test (layered constraints after each solve). Calibrated to the senior engineer bar — correct solutions, optimal complexity, clean communication of trade-offs.
+
+### DSA Tutor
+
+A Socratic tutor for senior/staff-level algorithmic prep, optimized for Kotlin, TypeScript, Go, and Java across Android and Fullstack domains. Never provides the solution first — instead guides through a 4-tier intervention ladder (constraint nudge → conceptual analogy → data structure hint → minimal code hint). Presents problems with Android- or Fullstack-flavored context, probes brute-force vs. optimal trade-offs before any code is written, and closes each session with a "Staff Perspective" production readiness check (e.g., stack overflow risk, external sorting for large data). Use this when you want to be coached toward the answer, not handed it.
+
 ## How I Use This
 
 A typical workflow looks like this:
 
-**Ramping up on a new codebase:** I start with `/advisor Help me understand the architecture of this project`. The advisor explores systematically — entry points, data flow, key abstractions — and produces a structured summary. I follow up with targeted questions until I have a working mental model.
+**Ramping up on a new codebase:** I start with `/engineering-agents:advisor Help me understand the architecture of this project`. The advisor explores systematically — entry points, data flow, key abstractions — and produces a structured summary. I follow up with targeted questions until I have a working mental model.
 
-**Planning a feature:** I use `/advisor` to think through the approach — what are the options, what are the trade-offs, what should we build first. Once I have a plan I'm confident in, I switch to `/implementer` with the specific task. The implementer proposes a concrete implementation plan, waits for my approval, then executes it with tests.
+**Planning a feature:** I use `/engineering-agents:advisor` to think through the approach — what are the options, what are the trade-offs, what should we build first. Once I have a plan I'm confident in, I switch to `/engineering-agents:implementer` with the specific task. The implementer proposes a concrete implementation plan, waits for my approval, then executes it with tests.
 
-**Reviewing and refactoring:** `/advisor` for code review and identifying what to change. `/implementer` for making the changes with proper test coverage and clean commits.
+**Reviewing and refactoring:** `/engineering-agents:advisor` for code review and identifying what to change. `/engineering-agents:implementer` for making the changes with proper test coverage and clean commits.
 
 The key pattern is: **think first, then build**. The advisor helps me make better decisions; the implementer helps me execute them cleanly.
 
@@ -65,11 +75,22 @@ This repo is structured as a Claude Code plugin:
 
 ```
 .claude-plugin/
-└── plugin.json               # Plugin manifest
-commands/
-├── implementer.md            # /implementer command (self-contained persona + task)
-├── advisor.md                # /advisor command (self-contained persona + task)
-└── recruiter.md              # /recruiter command (self-contained persona + task)
+└── plugin.json               # Plugin manifest (declares all commands)
+.claude/
+├── commands/
+│   ├── advisor.md            # Slim stub: frontmatter + @import + $ARGUMENTS
+│   ├── implementer.md
+│   ├── recruiter.md
+│   ├── interview.md
+│   └── dsa-tutor.md
+└── skills/
+    ├── advisor.md            # Full persona instructions (loaded on invocation)
+    ├── implementer.md
+    ├── recruiter.md
+    ├── interview.md
+    └── dsa-tutor.md
+.gemini/
+└── skills/                   # Synced Gemini CLI equivalents
 foundation.md                 # Global CLAUDE.md content (copy to ~/.claude/CLAUDE.md)
 ```
 
@@ -77,9 +98,11 @@ foundation.md                 # Global CLAUDE.md content (copy to ~/.claude/CLAU
 
 1. **Foundation** (`foundation.md`) — Copy this content into `~/.claude/CLAUDE.md`. It loads into every conversation and provides shared behavioral DNA: communication style, decision-making principles, and engineering identity.
 
-2. **Commands** (`commands/implementer.md`, `commands/advisor.md`, `commands/recruiter.md`) — Self-contained persona definitions with frontmatter for Claude Code's plugin system. Each file includes the full behavioral instructions and passes through `$ARGUMENTS`. When you invoke `/implementer Fix the auth bug`, Claude receives the implementer persona instructions plus your task.
+2. **Commands** (`.claude/commands/*.md`) — Slim activation stubs with frontmatter for Claude Code's plugin system. Each file imports the full persona skill via `@.claude/skills/<name>.md` and passes through `$ARGUMENTS`. When you invoke `/engineering-agents:implementer Fix the auth bug`, Claude loads the implementer skill content plus your task.
 
-3. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
+3. **Skills** (`.claude/skills/*.md`) — Full persona behavioral instructions, loaded on demand when a command is invoked. Keeping instructions here (rather than inline in command files) follows the progressive disclosure pattern: heavy content only enters context when activated.
+
+4. **Project CLAUDE.md** (per-project, not in this repo) — Each project's own `CLAUDE.md` supplies tech stack, structure, commands, and domain context. This layer is independent of the personas.
 
 ### Installation
 
@@ -99,7 +122,7 @@ cp foundation.md ~/.claude/CLAUDE.md
 
 - Validate personas across more project types and team contexts
 - Iterate on persona instructions based on real usage patterns
-- Explore additional personas (e.g., a reviewer persona, a debugging specialist)
+- Explore additional personas (e.g., a debugging specialist)
 
 ## License
 
