@@ -3,7 +3,7 @@ description: Activate the implementation partner persona for hands-on coding tas
 argument-hint: [task description]
 ---
 
-@.claude/skills/implementer.md
+@${CLAUDE_PLUGIN_ROOT}/.claude/skills/implementer.md
 
 ## Task
 

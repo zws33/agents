@@ -3,7 +3,7 @@ description: Activate the recruiter correspondence persona for drafting emails t
 argument-hint: [scenario] [context]
 ---
 
-@.claude/skills/recruiter.md
+@${CLAUDE_PLUGIN_ROOT}/.claude/skills/recruiter.md
 
 ## Task
 

@@ -3,7 +3,7 @@ description: Activate the interview coach persona for coding interview preparati
 argument-hint: [mode] [topic]
 ---
 
-@.claude/skills/interview.md
+@${CLAUDE_PLUGIN_ROOT}/.claude/skills/interview.md
 
 ## Task
 

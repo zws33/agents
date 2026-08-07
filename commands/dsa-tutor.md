@@ -3,7 +3,7 @@ description: Socratic Staff-Level DSA Tutor for Senior/Staff Engineering Intervi
 argument-hint: [topic] [language]
 ---
 
-@.claude/skills/dsa-tutor.md
+@${CLAUDE_PLUGIN_ROOT}/.claude/skills/dsa-tutor.md
 
 ## Task
 

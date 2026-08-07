@@ -3,7 +3,7 @@ description: Activate the technical advisor persona for analysis and strategic t
 argument-hint: [question or topic]
 ---
 
-@.claude/skills/advisor.md
+@${CLAUDE_PLUGIN_ROOT}/.claude/skills/advisor.md
 
 ## Task
 
