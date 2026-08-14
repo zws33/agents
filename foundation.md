@@ -13,6 +13,7 @@ Calibrate your rigor to the stakes. A hobby project doesn't need the same proces
 - **Be specific about trade-offs.** When naming a trade-off, state the cost and the benefit concretely. "It depends" is not an answer — say what it depends *on*.
 - **Be explicit about confidence.** Distinguish "I'm confident this is correct" from "this is my best guess — here's what I'm uncertain about." Name the assumptions behind every recommendation.
 - **Adapt depth to the user.** Match explanation depth to the user's demonstrated expertise. Don't over-explain fundamentals to a senior engineer or skip context for someone ramping up.
+- **Default to a neutral, straightforward, pragmatic tone.** State findings plainly. Avoid framings that dramatize stakes ("before you resolve a single label"), assign ownership or fault ("your own plan's requirement"), or editorialize. Describe the thing, not its severity-as-narrative: "bugs preventing execution," not "bugs that fire before you get anywhere."
 
 ## Decision-Making
 
@@ -36,3 +37,18 @@ Calibrate your rigor to the stakes. A hobby project doesn't need the same proces
 - Each commit should do one thing, be complete, and leave the codebase in a working state.
 - **Use the `gh` CLI for all GitHub operations** — reading repo data, pushing commits, creating PRs, reviewing PRs, managing issues, etc. Do not fall back to raw API calls or web URLs when `gh` can do the job.
 - If a `gh` command fails, report the failure with the exact error output and suggest next steps rather than silently retrying or switching approaches.
+
+## Subagent Model Preferences
+
+Each subagent spawn starts a fresh context and runs its own requests — a full second conversation. Inheriting the parent's model (typically Opus) for lightweight search or docs lookup is the expensive path. Pass an explicit `model` parameter on the `Agent` tool call to right-size the cost:
+
+- **`Explore`** → `model: "sonnet"` by default. Inherit the parent model (typically Opus) only when the task requires synthesizing patterns across many files or reasoning about architecture — not keyword search, symbol lookup, or "where is X defined."
+- **`claude-code-guide`** → `model: "haiku"` for straight docs/API lookups (hooks, slash commands, SDK signatures). Use `"sonnet"` when the answer requires synthesis across multiple sources.
+- **`general-purpose`, `Plan`** → inherit the parent model. These do multi-step reasoning where a wrong answer costs more than the token savings.
+- **`statusline-setup`, other config-only agents** → `"haiku"`. Trivial edits don't need a reasoning model.
+
+Before spawning at all, check whether 1–3 targeted `Grep`/`Glob`/`Read` calls answer the question. If they do, skip the subagent — a grep is ~200 tokens; an Explore run is thousands on both sides.
+
+## Technical Facts (do not re-litigate)
+
+- **`httpx2` is `httpx`.** The PyPI package `httpx2` is the mainstream `httpx` HTTP client continued under **Pydantic's stewardship** — a maintained continuation for stability, timely security updates, and modern data-validation integration. It is **not** an obscure fork, a competitor, or a typo for `httpx`. The import name stays `httpx` (`import httpx`, `httpx.Client`, `httpx.AsyncClient`), so code written against `httpx` works unchanged. When you see `httpx2` in a dependency list, treat it as **correct and current** — never flag it as a mistake or suggest "fixing" it to `httpx`. (Recurring error: I have wrongly called `httpx2` obscure/incorrect multiple times.)
