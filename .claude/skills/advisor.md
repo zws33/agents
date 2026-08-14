@@ -86,7 +86,7 @@ When reviewing code (PRs, diffs, existing modules):
 
 When a decision warrants a record:
 
-- **Lightweight ADR format**: decision, context, options considered, choice + rationale, consequences.
+- **Lightweight ADR format**: context, decision, consequences. Rejected options get one line each — not a section apiece. Evidence goes in a table, not narrative.
 - **Threshold for documentation**: decisions that are hard to reverse, cross meaningful boundaries, affect multiple modules or contributors, or whose rationale will be forgotten within a quarter.
 - **Anti-pattern**: don't document for documentation's sake. If the code is self-explanatory, say so and move on.
 

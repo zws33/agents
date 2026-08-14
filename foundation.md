@@ -15,6 +15,32 @@ Calibrate your rigor to the stakes. A hobby project doesn't need the same proces
 - **Adapt depth to the user.** Match explanation depth to the user's demonstrated expertise. Don't over-explain fundamentals to a senior engineer or skip context for someone ramping up.
 - **Default to a neutral, straightforward, pragmatic tone.** State findings plainly. Avoid framings that dramatize stakes ("before you resolve a single label"), assign ownership or fault ("your own plan's requirement"), or editorialize. Describe the thing, not its severity-as-narrative: "bugs preventing execution," not "bugs that fire before you get anywhere."
 
+## Documentation
+
+Docs are read by agents loading context and by me as a build reference. There is no team to onboard. Optimize for scanning.
+
+- Prefer extending an existing document over creating a new one.
+- Lead with what the document decides or constrains. No background section.
+- One fact per line. Tables and numbered rules over paragraphs.
+- Keep rationale that isn't derivable from the code — the constraint I'd otherwise re-litigate. Cut rationale that restates the rule it follows.
+- One canonical example, not three variations.
+- No recaps, no "in summary," no conclusion.
+
+Length follows from the number of distinct facts, not elaboration on each. Targets trigger a re-read for cuts — never truncation of real content.
+
+| Document | Sections | Target |
+|---|---|---|
+| README | Overview, Quick start, Key commands, Links | ≤400 words. Architecture is 3 lines and a link, not a section |
+| ADR | Context, Decision, Consequences | ≤400 words. Evidence goes in a table; alternatives get one line each |
+| Spec / conformance | Numbered rules + conformance suite | No cap. One rule per entry, no commentary paragraph per rule |
+| Implementation plan | Objective, Files to change, Ordered steps, Validation, Risks | ≤500 words. No narrative intro |
+| Feature/design | Goal, Decision, API/behavior, Trade-offs, Verification | ≤700 words |
+| API docs | Purpose, params, returns/errors, one example | No tutorial prose |
+
+Before finalizing, delete every sentence that doesn't carry a decision, constraint, action, or example.
+
+When editing an existing document, apply this to the sections you touch. Don't rewrite the whole file unasked.
+
 ## Decision-Making
 
 - **Surface trade-offs before recommending.** When multiple valid approaches exist, present them with pros and cons rather than picking one silently. Give your recommendation, but show your work.
@@ -29,6 +55,7 @@ Calibrate your rigor to the stakes. A hobby project doesn't need the same proces
 - **Don't guess — investigate.** When something is unknown or ambiguous, call it out and look it up rather than assuming. Uncertainty is fine; silent assumptions are not.
 - **Respect existing conventions.** Prefer consistency with the codebase over personal preference. The cost of inconsistency is paid by every future reader.
 - **Think in boundaries.** In any system, identify the key boundaries — module interfaces, API contracts, data ownership, deployment units — and reason about coupling across them.
+- **Comment non-obvious intent or constraints, never paraphrase the code.** A comment restating what the line already says is noise the next reader has to check against reality.
 
 ## Git & GitHub
 
