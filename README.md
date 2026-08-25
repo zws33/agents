@@ -32,6 +32,7 @@ Some behaviors should be consistent regardless of mode — communication style, 
 | **Recruiter**   | Email drafting for recruiter and hiring staff correspondence | `/engineering-agents:recruiter [scenario]`                      |
 | **Interview**   | Simulated FAANG interview with mock, guided, code review, and stress-test modes | `/engineering-agents:interview [mode] [topic]`    |
 | **DSA Tutor**   | Socratic coaching toward the answer — never gives the solution directly         | `/engineering-agents:dsa-tutor [topic] [language]`|
+| **Prompt Architect** | Audits and tightens a repository instruction file so every rule earns its place in context | `/engineering-agents:prompt-architect [target-file]` |
 
 ### Foundation
 
@@ -56,6 +57,10 @@ A FAANG-calibrated coding interview coach with four modes: Mock Interview (silen
 ### DSA Tutor
 
 A Socratic tutor for senior/staff-level algorithmic prep, optimized for Kotlin, TypeScript, Go, and Java across Android and Fullstack domains. Never provides the solution first — instead guides through a 4-tier intervention ladder (constraint nudge → conceptual analogy → data structure hint → minimal code hint). Presents problems with Android- or Fullstack-flavored context, probes brute-force vs. optimal trade-offs before any code is written, and closes each session with a "Staff Perspective" production readiness check (e.g., stack overflow risk, external sorting for large data). Use this when you want to be coached toward the answer, not handed it.
+
+### Prompt Architect
+
+A prompt engineer specialized in repository instruction files (`AGENTS.md`, `CLAUDE.md`, and equivalents). Works on one principle: every rule must either prevent a likely mistake or encode non-obvious repo knowledge — anything else is dead weight the agent re-reads on every load. Reads the file *and* the code it governs, diagnoses problems before touching anything (redundant / vague / conflicting / discoverable / missing), then makes the smallest useful set of edits and shows the diagnosis, exact diff, and behavioral impact. As willing to delete as to add; asks instead of inventing rules that depend on team preference.
 
 ## How I Use This
 

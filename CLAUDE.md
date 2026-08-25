@@ -15,6 +15,7 @@ This is a plugin repo, not a project repo. It defines reusable personas that can
 | `/engineering-agents:recruiter` | Recruiter email drafting |
 | `/engineering-agents:interview` | FAANG interview coaching (mock, guided, review, stress test) |
 | `/engineering-agents:dsa-tutor` | Socratic DSA coaching for senior/staff prep |
+| `/engineering-agents:prompt-architect` | Audit and tighten a repo instruction file (AGENTS.md / CLAUDE.md) |
 
 ## Structure
 
